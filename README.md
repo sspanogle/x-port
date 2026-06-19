@@ -34,7 +34,13 @@ Optional validation:
 ```bash
 npm run build
 npm test
+npm audit
 ```
+
+Current dependency state:
+
+- `npm audit` is clean
+- `postcss` is intentionally pinned via `overrides` to `8.5.15` so the Next.js dependency tree does not pull a vulnerable release
 
 ## X App Setup
 

@@ -296,3 +296,10 @@ Validation on 2026-06-19:
 - `npm run build`
 - `npm test`
 - `npm run lint`
+- `npm audit`
+
+Dependency hardening on 2026-06-19:
+
+- upgraded the Vitest toolchain to a non-vulnerable release line
+- added a `postcss` override so the Next.js dependency tree resolves to `8.5.15`
+- verified GitHub Dependabot alerts for the previously reported issues are fixed / no longer open
