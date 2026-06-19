@@ -16,10 +16,10 @@ describe("cli", () => {
     expect(result.stderr).toContain("Unsupported export format");
   });
 
-  it("marks login as not implemented yet", async () => {
+  it("requires a client id for login", async () => {
     const result = await runCli(["login"]);
 
     expect(result.code).toBe(1);
-    expect(result.stderr).toContain("login is not implemented yet");
+    expect(result.stderr).toContain("Missing X client ID");
   });
 });

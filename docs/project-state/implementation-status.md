@@ -20,8 +20,10 @@ Current application status:
 
 - framework bootstrapped into the repository
 - product and technical docs are seeded with X-Port scope
-- initial CLI/package scaffold and pure export formatters are implemented
-- OAuth, persistence, and real X API integration are still pending
+- initial CLI/package scaffold is in place
+- local SQLite persistence is implemented
+- OAuth PKCE helpers and X API wiring are implemented
+- export commands can fetch bookmarks and write Markdown, JSON, and CSV files locally
 
 ---
 
@@ -32,28 +34,30 @@ Current application status:
 Status: in progress
 Implemented:
 
-- framework and kickoff alignment
-- initial CLI/package scaffold
+- project scope and local-first guardrails
+- CLI/package scaffold
 - pure export formatter layer
+- local persistence layer
 
 Not yet implemented:
 
-- login flow
-- export pipeline
-- local persistence
+- user-facing success messaging polish
+- broader configuration ergonomics
 
 ### `product/prd/002-mvp-experience.md`
 
 Status: in progress
 Implemented:
 
-- command names and core flow defined in docs
-- `xport login` and `xport export --format` command shells
-- basic command validation and help output
+- `xport login` command shell
+- `xport export --format` command shell
+- login flow persists OAuth session and authenticated user identity
+- export flow reads stored session and writes local files
 
 Not yet implemented:
 
-- auth and export execution
+- browserless auth fallback
+- richer success/error copy
 
 ### `product/prd/003-domain-rules.md`
 
@@ -62,11 +66,12 @@ Implemented:
 
 - domain vocabulary drafted
 - bookmark and export types
-- pure export formatter layer
+- bookmark fetch mapping from X API responses
+- export record persistence
 
 Deferred design:
 
-- persistence schema details
+- persistence schema details beyond the current MVP
 
 ### `product/prd/004-platform-and-accessibility.md`
 
@@ -75,10 +80,11 @@ Implemented:
 
 - local-first platform direction defined
 - Node.js CLI scaffold with terminal-first output
+- stable exit codes and explicit file output messages
 
 Not yet implemented:
 
-- operational command behavior
+- accessibility review of broader command copy
 
 ### `product/prd/005-future-direction.md`
 
@@ -97,11 +103,12 @@ Status: in progress
 Implemented:
 
 - high-level login and export flows documented
-- command shells and validation paths exist
+- login and export command paths are in code
+- export flow supports local refresh and local file output
 
 Not yet implemented:
 
-- executable flow implementation
+- fully polished operator UX for browser launch and callback recovery
 
 ### `product/prd/007-inputs-and-edge-cases.md`
 
@@ -110,10 +117,12 @@ Implemented:
 
 - primary validation and edge cases identified
 - invalid export format handling exists
+- missing client ID handling exists
+- expired session refresh path exists
 
 Not yet implemented:
 
-- input handling for OAuth and persistence flows
+- explicit retry UI for callback and network errors
 
 ---
 
@@ -126,7 +135,7 @@ Implemented:
 
 - layered architecture documented
 - module boundaries drafted
-- package, CLI, domain, and exporter files created
+- package, CLI, domain, exporter, storage, and OAuth files created
 
 ### `engineering/tdd/002-state-and-flow.md`
 
@@ -135,6 +144,7 @@ Implemented:
 
 - state and flow model drafted
 - CLI command dispatch and validation paths are in code
+- login and export flows have real state transitions
 
 ### `engineering/tdd/003-ui-system.md`
 
@@ -150,6 +160,7 @@ Status: in progress
 Implemented:
 
 - validation and persistence boundaries drafted
+- SQLite-backed session and export persistence exist
 - command input validation exists for the scaffolded CLI
 
 ### `engineering/tdd/005-testing-strategy.md`
@@ -158,12 +169,13 @@ Status: in progress
 Implemented:
 
 - testing strategy prioritized
-- unit tests cover exporter output and CLI command validation
+- unit tests cover exporter output, OAuth helpers, storage, and CLI command validation
+- integration-style tests cover export flow with mocked X API responses
 
 ---
 
 ## Notes
 
-- repository now has a working scaffold and pure export formatters
-- login, X API access, and persistence still need implementation
-- update this file again when the storage and real export pipeline land
+- the repo now has a working implementation slice beyond scaffolding
+- login still depends on live X credentials and an authenticated callback flow
+- update this file again when the auth callback UX or export formatting rules change materially

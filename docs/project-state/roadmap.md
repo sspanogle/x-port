@@ -10,14 +10,14 @@ It is not a release promise. It exists to help future sessions understand what s
 
 ## Current Phase
 
-Foundation Alignment
+Core User Flow
 
 Current project state:
 
-- framework bootstrapped into repo
+- framework bootstrapped into the repo
 - product scope captured in kickoff PRDs
-- initial CLI/package scaffold and pure export formatters are implemented
-- login, persistence, and live X API integration are still pending
+- login, persistence, and bookmark export plumbing are implemented
+- callback UX, token refresh ergonomics, and output polishing still need work
 
 ---
 
@@ -33,7 +33,7 @@ Goals:
 
 Status:
 
-- in progress
+- completed
 
 ### Milestone 2: Core User Flow
 
@@ -45,7 +45,7 @@ Goals:
 
 Status:
 
-- pending
+- in progress
 
 ### Milestone 3: First Serious UI Pass
 
