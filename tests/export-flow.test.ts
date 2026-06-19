@@ -1,91 +1,81 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { exportBookmarks } from "../src/application/export.js";
 import { openAppDatabase } from "../src/storage/database.js";
 
-describe("export flow", () => {
-  it("exports bookmarks from stored session and writes markdown file", async () => {
+describe("exportBookmarks", () => {
+  const cleanupPaths: string[] = [];
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+
+    for (const cleanupPath of cleanupPaths.splice(0)) {
+      fs.rmSync(cleanupPath, { recursive: true, force: true });
+    }
+  });
+
+  it("writes one markdown file per bookmark without calling fetch", () => {
     const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), "x-port-data-"));
     const exportDir = fs.mkdtempSync(path.join(os.tmpdir(), "x-port-exports-"));
+    cleanupPaths.push(dataDir, exportDir);
+
     const db = openAppDatabase(dataDir);
 
-    db.saveSession({
-      accessToken: "access-token",
-      refreshToken: undefined,
-      expiresAt: "2999-01-01T00:00:00.000Z",
-      scope: "tweet.read users.read bookmark.read offline.access",
-      tokenType: "bearer",
-      userId: "2244994945",
-      username: "XDevelopers",
-      name: "X Developers",
-      updatedAt: "2026-06-18T21:55:00.000Z",
-    });
+    db.saveBookmarks(
+      [
+        {
+          id: "1",
+          text: "First bookmark",
+          authorName: "Ada Lovelace",
+          authorHandle: "ada",
+          url: "https://x.com/i/web/status/1",
+          createdAt: "2026-06-18T20:00:00.000Z",
+          article: { title: "First Article" },
+        },
+        {
+          id: "2",
+          text: "Second bookmark",
+          authorName: "Grace Hopper",
+          authorHandle: "grace",
+          url: "https://x.com/i/web/status/2",
+          createdAt: "2026-06-18T20:05:00.000Z",
+        },
+      ],
+      "2026-06-18T21:47:00.000Z",
+    );
 
     const fetchSpy = vi.spyOn(globalThis, "fetch");
-    fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
-      const url = new URL(String(input));
-      if (url.pathname === "/2/users/2244994945/bookmarks") {
-        return new Response(
-          JSON.stringify({
-            data: [
-              {
-                id: "1",
-                text: "Short fallback text",
-                created_at: "2026-06-18T20:00:00.000Z",
-                author_id: "2",
-                note_tweet: {
-                  full_text: "Full note tweet content for the markdown export.",
-                },
-                article: {
-                  title: "Article title",
-                  text: "Article body content",
-                },
-              },
-            ],
-            includes: {
-              users: [
-                {
-                  id: "2",
-                  username: "ada",
-                  name: "Ada Lovelace",
-                },
-              ],
-            },
-            meta: {},
-          }),
-          { status: 200 },
-        );
-      }
 
-      throw new Error(`Unexpected request: ${url.toString()}`);
+    const output = exportBookmarks({
+      format: "md",
+      exportDir,
+      db,
+      now: new Date("2026-06-18T21:48:00.000Z"),
     });
 
-    try {
-      const output = await exportBookmarks({
-        format: "md",
-        exportDir,
-        clientId: undefined,
-        db,
-        now: new Date("2026-06-18T21:48:00.000Z"),
-      });
+    expect(output.bookmarkCount).toBe(2);
+    expect(path.basename(output.outputPath)).toBe(
+      "bookmarks-2026-06-18T21-48-00-000Z",
+    );
+    expect(output.outputPaths).toHaveLength(2);
+    expect(fetchSpy).not.toHaveBeenCalled();
 
-      expect(output.bookmarkCount).toBe(1);
-      expect(output.outputPath).toContain(
-        "bookmarks-2026-06-18T21-48-00-000Z.md",
-      );
-      expect(fs.existsSync(path.resolve(output.outputPath))).toBe(true);
+    const exportedFiles = fs
+      .readdirSync(output.outputPath)
+      .filter((entry) => entry.endsWith(".md"))
+      .sort();
 
-      const content = fs.readFileSync(path.resolve(output.outputPath), "utf8");
-      expect(content).toContain(
-        "Full note tweet content for the markdown export.",
-      );
-      expect(content).toContain("### Raw Article");
-      expect(content).toContain('"title": "Article title"');
-    } finally {
-      fetchSpy.mockRestore();
-      db.close();
-    }
+    expect(exportedFiles).toHaveLength(2);
+    expect(exportedFiles[0]).toContain("ada-1.md");
+    expect(exportedFiles[1]).toContain("grace-2.md");
+
+    const firstBookmark = fs.readFileSync(output.outputPaths[0], "utf8");
+    const secondBookmark = fs.readFileSync(output.outputPaths[1], "utf8");
+
+    expect(firstBookmark).toContain("First bookmark");
+    expect(firstBookmark).toContain("First Article");
+    expect(secondBookmark).toContain("Second bookmark");
   });
 });

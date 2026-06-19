@@ -6,12 +6,12 @@ import {
   exchangeAuthorizationCode,
   fetchAuthenticatedUser,
   type OAuthSession,
-} from "./client.js";
+} from "./client";
 import {
   createCodeChallenge,
   createCodeVerifier,
   createState,
-} from "./pkce.js";
+} from "./pkce";
 
 export interface OAuthLoginResult {
   session: OAuthSession;
@@ -46,30 +46,46 @@ async function waitForAuthorizationCode(
 
         if (state !== expectedState) {
           res.statusCode = 400;
-          res.end("State mismatch.");
-          reject(new Error("OAuth callback state mismatch."));
+          res.end(
+            "OAuth state mismatch. Close this tab and run `xport login` again.",
+          );
+          reject(
+            new Error("OAuth callback state mismatch. Run `xport login` again."),
+          );
           return;
         }
 
         if (error) {
           res.statusCode = 400;
-          res.end(`OAuth error: ${error}`);
-          reject(new Error(`OAuth authorization failed: ${error}`));
+          res.end(
+            `OAuth error: ${error}. Return to the terminal and retry \`xport login\`.`,
+          );
+          reject(
+            new Error(
+              `OAuth authorization failed: ${error}. Run \`xport login\` again.`,
+            ),
+          );
           return;
         }
 
         if (!code) {
           res.statusCode = 400;
-          res.end("Missing authorization code.");
+          res.end(
+            "Missing authorization code. Return to the terminal and run `xport login` again.",
+          );
           reject(
-            new Error("OAuth callback did not include an authorization code."),
+            new Error(
+              "OAuth callback did not include an authorization code. Run `xport login` again.",
+            ),
           );
           return;
         }
 
         res.statusCode = 200;
         res.setHeader("Content-Type", "text/plain; charset=utf-8");
-        res.end("Authorization received. You can close this tab.");
+        res.end(
+          "Authorization received. You can close this tab and return to the terminal.",
+        );
         server.close();
         resolve({ code });
       } catch (error) {

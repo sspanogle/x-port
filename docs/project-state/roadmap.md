@@ -2,21 +2,19 @@
 
 ## Purpose
 
-This document describes the current planned milestone sequence for `X-Port`.
-
-It is not a release promise. It exists to help future sessions understand what should likely happen next.
+This document describes the current planned milestone sequence for `X-Port`. It is not a release promise. It exists to help future sessions understand what should likely happen next.
 
 ---
 
 ## Current Phase
 
-Core User Flow
+First Serious UI Pass
 
 Current project state:
 
 - framework bootstrapped into the repo
-- product scope captured in kickoff PRDs
-- login, persistence, bookmark export plumbing are implemented
+- product scope captured in the kickoff PRDs
+- login, persistence, and bookmark sync/export plumbing are implemented
 - callback UX, token refresh ergonomics, and output polishing still need work
 
 ---
@@ -27,9 +25,9 @@ Current project state:
 
 Goals:
 
-- align repo guidance with the product scope
+- align repo guidance and product scope
 - confirm naming and doc structure
-- prepare the repository for implementation without scope drift
+- prepare repository implementation without scope drift
 
 Status:
 
@@ -40,12 +38,12 @@ Status:
 Goals:
 
 - implement `login`
-- implement local storage and export plumbing
-- implement the first working `export` path
+- implement local storage export plumbing
+- implement first working `export` path
 
 Status:
 
-- in progress
+- completed
 
 ### Milestone 3: First Serious UI Pass
 
@@ -57,7 +55,7 @@ Goals:
 
 Status:
 
-- pending
+- in progress
 
 ### Milestone 4: Testing UX Hardening
 
@@ -76,8 +74,8 @@ Status:
 Goals:
 
 - refine docs and CLI copy
-- tighten file-path and output ergonomics
-- prepare for release packaging and future integrations
+- tighten file-path output ergonomics
+- prepare release packaging and future integrations
 
 Status:
 

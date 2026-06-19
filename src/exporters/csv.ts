@@ -1,4 +1,4 @@
-import type { BookmarkExport } from "../domain/bookmark.js";
+import type { BookmarkExport } from "../domain/bookmark";
 
 function escapeCsvCell(value: string): string {
   if (/[,"\n]/.test(value)) {

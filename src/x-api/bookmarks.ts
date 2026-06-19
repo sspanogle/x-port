@@ -1,5 +1,5 @@
-import type { Bookmark } from "../domain/bookmark.js";
-import type { XApiClient } from "./client.js";
+import type { Bookmark } from "../domain/bookmark";
+import type { XApiClient } from "./client";
 
 interface BookmarkUser {
   id: string;

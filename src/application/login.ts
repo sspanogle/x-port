@@ -1,6 +1,6 @@
-import { loadRuntimeConfig } from "../runtime/config.js";
-import { runOAuthLogin } from "../oauth/flow.js";
-import type { AppDatabase, StoredSession } from "../storage/database.js";
+import { loadRuntimeConfig } from "../runtime/config";
+import { runOAuthLogin } from "../oauth/flow";
+import type { AppDatabase, StoredSession } from "../storage/database";
 
 export interface LoginResult {
   user: {

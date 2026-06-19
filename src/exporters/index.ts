@@ -1,7 +1,7 @@
-import type { BookmarkExport, ExportFormat } from "../domain/bookmark.js";
-import { renderCsvExport } from "./csv.js";
-import { renderJsonExport } from "./json.js";
-import { renderMarkdownExport } from "./markdown.js";
+import type { BookmarkExport, ExportFormat } from "../domain/bookmark";
+import { renderCsvExport } from "./csv";
+import { renderJsonExport } from "./json";
+import { renderMarkdownExport } from "./markdown";
 
 export function renderExport(
   format: ExportFormat,

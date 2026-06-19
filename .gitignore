@@ -1,8 +1,11 @@
 dist/
 coverage/
 node_modules/
+.next/
+*.tsbuildinfo
 .DS_Store
 .env
 .env.*
+!.env.example
 exports/
 .x-port/

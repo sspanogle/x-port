@@ -1,14 +1,18 @@
 import { Command } from "commander";
 import { z } from "zod";
-import { exportBookmarks } from "./application/export.js";
-import { loginWithConfig } from "./application/login.js";
-import { loadRuntimeConfig } from "./runtime/config.js";
-import { openAppDatabase } from "./storage/database.js";
+import { exportBookmarks } from "./application/export";
+import { startDashboard } from "./application/dashboard";
+import { loginWithConfig } from "./application/login";
+import { syncBookmarks } from "./application/sync";
+import { loadRuntimeConfig } from "./runtime/config";
+import { openAppDatabase } from "./storage/database";
 import {
+  dashboardSuccessMessage,
   exportSuccessMessage,
   invalidExportFormatMessage,
   loginSuccessMessage,
-} from "./presentation/status.js";
+  syncSuccessMessage,
+} from "./presentation/status";
 
 export interface CliResult {
   code: number;
@@ -33,16 +37,13 @@ function parseScopes(value: string | undefined): string[] | undefined {
     .filter(Boolean);
 }
 
-export async function runCli(argv: readonly string[]): Promise<CliResult> {
-  if (argv.length === 0) {
-    return createResult(0, "Use `xport --help` to see available commands.\n");
-  }
-
+export async function runCli(argv: string[]): Promise<CliResult> {
   let result = createResult(0);
+
   const program = new Command();
   program
     .name("xport")
-    .description("Export X bookmarks into durable local formats.")
+    .description("Export your X bookmarks into durable local formats.")
     .exitOverride();
   program.configureOutput({
     writeOut: (str) => {
@@ -59,7 +60,7 @@ export async function runCli(argv: readonly string[]): Promise<CliResult> {
     .option("--client-id <id>", "X OAuth client ID")
     .option("--redirect-uri <uri>", "OAuth redirect URI")
     .option("--scopes <scopes>", "Comma or space separated OAuth scopes")
-    .option("--no-open", "Do not open the authorization URL in a browser")
+    .option("--no-open", "Do not open authorization URL in a browser")
     .option("--data-dir <dir>", "Directory used for local app data")
     .action(
       async (options: {
@@ -71,7 +72,6 @@ export async function runCli(argv: readonly string[]): Promise<CliResult> {
       }) => {
         const runtime = loadRuntimeConfig(process.env, process.cwd());
         const db = openAppDatabase(options.dataDir ?? runtime.dataDir);
-
         try {
           const output = await loginWithConfig({
             clientId: options.clientId,
@@ -98,16 +98,84 @@ export async function runCli(argv: readonly string[]): Promise<CliResult> {
     );
 
   program
-    .command("export")
-    .description("Export bookmarks to a local file.")
-    .requiredOption("-f, --format <format>", "Export format: md, json, or csv")
+    .command("sync")
+    .description("Fetch bookmarks from X and store them in SQLite.")
     .option("--client-id <id>", "X OAuth client ID")
+    .option("--data-dir <dir>", "Directory used for local app data")
+    .action(async (options: { clientId?: string; dataDir?: string }) => {
+      const runtime = loadRuntimeConfig(process.env, process.cwd());
+      const db = openAppDatabase(options.dataDir ?? runtime.dataDir);
+      try {
+        const clientId = options.clientId ?? runtime.clientId;
+        const output = await syncBookmarks(
+          clientId ? { db, clientId } : { db },
+        );
+
+        result = createResult(
+          0,
+          syncSuccessMessage(output.fetchedCount, output.insertedCount),
+        );
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Unknown sync error.";
+        result = createResult(1, "", `${message}\n`);
+      } finally {
+        db.close();
+      }
+    });
+
+  program
+    .command("dashboard")
+    .description("Open a local dashboard for bookmarks and exports.")
+    .option("--client-id <id>", "X OAuth client ID")
+    .option("--data-dir <dir>", "Directory used for local app data")
+    .option("--export-dir <dir>", "Directory for exported files")
+    .option("--host <host>", "Host to bind the dashboard server", "127.0.0.1")
+    .option("--port <port>", "Port to bind the dashboard server", "8788")
+    .option("--no-open", "Do not open the dashboard in a browser")
+    .action(
+      async (options: {
+        clientId?: string;
+        dataDir?: string;
+        exportDir?: string;
+        host?: string;
+        port?: string;
+        open?: boolean;
+      }) => {
+        const runtime = loadRuntimeConfig(process.env, process.cwd());
+        const db = openAppDatabase(options.dataDir ?? runtime.dataDir);
+        try {
+          const clientId = options.clientId ?? runtime.clientId;
+          const started = await startDashboard({
+            db,
+            dataDir: options.dataDir ?? runtime.dataDir,
+            exportDir: options.exportDir ?? runtime.exportDir,
+            host: options.host ?? "127.0.0.1",
+            port: Number(options.port ?? 8788),
+            openBrowser: options.open ?? runtime.openBrowser,
+            clientId: clientId ?? undefined,
+          });
+
+          result = createResult(0, dashboardSuccessMessage(started.url));
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "Unknown dashboard error.";
+          result = createResult(1, "", `${message}
+`);
+          db.close();
+        }
+      },
+    );
+
+  program
+    .command("export")
+    .description("Export locally cached bookmarks into a file.")
+    .requiredOption("-f, --format <format>", "Export format: md, json, or csv")
     .option("--data-dir <dir>", "Directory used for local app data")
     .option("--export-dir <dir>", "Directory for exported files")
     .action(
       async (options: {
         format?: string;
-        clientId?: string;
         dataDir?: string;
         exportDir?: string;
       }) => {
@@ -123,12 +191,10 @@ export async function runCli(argv: readonly string[]): Promise<CliResult> {
 
         const runtime = loadRuntimeConfig(process.env, process.cwd());
         const db = openAppDatabase(options.dataDir ?? runtime.dataDir);
-
         try {
           const output = await exportBookmarks({
             format: parsedFormat.data,
             exportDir: options.exportDir ?? runtime.exportDir,
-            clientId: options.clientId ?? runtime.clientId,
             db,
           });
 
@@ -151,25 +217,18 @@ export async function runCli(argv: readonly string[]): Promise<CliResult> {
     );
 
   try {
-    await program.parseAsync([...argv], { from: "user" });
-  } catch (error) {
-    if (
-      error instanceof Error &&
-      "code" in error &&
-      String((error as { code?: unknown }).code) === "commander.helpDisplayed"
-    ) {
-      return createResult(0, result.stdout, result.stderr);
-    }
-
-    if (error instanceof Error) {
+    if (argv.length === 0) {
       return createResult(
-        1,
-        result.stdout,
-        `${result.stderr}${error.message}\n`,
+        0,
+        `${program.helpInformation()}\nRun xport --help for usage.\n`,
       );
     }
 
-    return createResult(1, result.stdout, "Unknown CLI error.\n");
+    await program.parseAsync(argv, { from: "user" });
+  } catch {
+    if (result.code === 0) {
+      return createResult(1, result.stdout, "Unknown CLI error.\n");
+    }
   }
 
   return result;

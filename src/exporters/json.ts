@@ -1,4 +1,4 @@
-import type { BookmarkExport } from "../domain/bookmark.js";
+import type { BookmarkExport } from "../domain/bookmark";
 
 export function renderJsonExport(exportData: BookmarkExport): string {
   return `${JSON.stringify(

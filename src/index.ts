@@ -1,5 +1,5 @@
 import process from "node:process";
-import { runCli } from "./cli.js";
+import { runCli } from "./cli";
 
 async function main(): Promise<void> {
   const result = await runCli(process.argv.slice(2));

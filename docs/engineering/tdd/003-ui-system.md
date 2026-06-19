@@ -37,3 +37,14 @@ If a future UI layer is introduced, it should reuse the same output semantics an
 - command output is readable in a terminal first
 - generated export formatting stays stable across runs
 - presentation code remains separate from domain logic
+## 2026-06-19 Update
+
+The current V1 UI surface is a localhost-only Next.js dashboard.
+
+It is intentionally operator-facing and utility-first:
+
+- status panel for data directory, export directory, saved session, and cached bookmark count
+- bookmark list pulled from the same SQLite cache used by CLI commands
+- direct local actions for sync and export
+
+This remains a local-first shell. It does not introduce any hosted service, multi-user state, or cloud dependency.

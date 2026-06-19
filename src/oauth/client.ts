@@ -12,6 +12,14 @@ export interface OAuthSession {
   scope: string;
 }
 
+interface OAuthTokenResponse {
+  access_token: string;
+  refresh_token?: string;
+  expires_in: number;
+  token_type: string;
+  scope: string;
+}
+
 export interface AuthenticatedUser {
   id: string;
   username: string;
@@ -45,6 +53,18 @@ async function readJsonResponse<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
+function mapOAuthTokenResponse(response: OAuthTokenResponse): OAuthSession {
+  return {
+    accessToken: response.access_token,
+    expiresIn: response.expires_in,
+    tokenType: response.token_type,
+    scope: response.scope,
+    ...(response.refresh_token
+      ? { refreshToken: response.refresh_token }
+      : {}),
+  };
+}
+
 export async function exchangeAuthorizationCode(options: {
   code: string;
   clientId: string;
@@ -67,7 +87,8 @@ export async function exchangeAuthorizationCode(options: {
     body,
   });
 
-  return readJsonResponse<OAuthSession>(response);
+  const tokenResponse = await readJsonResponse<OAuthTokenResponse>(response);
+  return mapOAuthTokenResponse(tokenResponse);
 }
 
 export async function refreshAccessToken(options: {
@@ -88,7 +109,8 @@ export async function refreshAccessToken(options: {
     body,
   });
 
-  return readJsonResponse<OAuthSession>(response);
+  const tokenResponse = await readJsonResponse<OAuthTokenResponse>(response);
+  return mapOAuthTokenResponse(tokenResponse);
 }
 
 export async function fetchAuthenticatedUser(

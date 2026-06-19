@@ -38,7 +38,12 @@ describe("exporters", () => {
     expect(output).toContain("# X-Port Bookmark Export");
     expect(output).toContain("Ada Lovelace (@ada)");
     expect(output).toContain("Full note tweet text with extra context");
-    expect(output).toContain("### Raw Article");
+    expect(output).toContain("### Article");
+    expect(output).toContain("- Title: Long-form article");
+    expect(output).toContain("- Body: Article body text");
+    expect(output).toContain("- Links:");
+    expect(output).toContain("https://example.com/article");
+    expect(output).toContain("### Raw Article Metadata");
     expect(output).toContain('"title": "Long-form article"');
   });
 
