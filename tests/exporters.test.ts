@@ -9,11 +9,24 @@ const sampleExport: BookmarkExport = {
   bookmarks: [
     {
       id: "1",
-      text: "Bookmark text with *markdown* and commas, too",
+      text: "Bookmark text *markdown* commas, too",
+      fullText:
+        "Full note tweet text with extra context and an article block below.",
       authorName: "Ada Lovelace",
       authorHandle: "ada",
       url: "https://x.com/ada/status/1",
       createdAt: "2026-06-17T12:00:00.000Z",
+      article: {
+        title: "Long-form article",
+        text: "Article body text",
+        entities: {
+          urls: [
+            {
+              url: "https://example.com/article",
+            },
+          ],
+        },
+      },
     },
   ],
 };
@@ -24,7 +37,9 @@ describe("exporters", () => {
 
     expect(output).toContain("# X-Port Bookmark Export");
     expect(output).toContain("Ada Lovelace (@ada)");
-    expect(output).toContain("\\*markdown\\*");
+    expect(output).toContain("Full note tweet text with extra context");
+    expect(output).toContain("### Raw Article");
+    expect(output).toContain('"title": "Long-form article"');
   });
 
   it("renders json exports", () => {
@@ -44,6 +59,6 @@ describe("exporters", () => {
     expect(output).toContain(
       "id,text,authorName,authorHandle,url,createdAt,exportedAt",
     );
-    expect(output).toContain('"Bookmark text with *markdown* and commas, too"');
+    expect(output).toContain('"Bookmark text *markdown* commas, too"');
   });
 });

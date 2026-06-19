@@ -24,6 +24,7 @@ Current application status:
 - local SQLite persistence is implemented
 - OAuth PKCE helpers and X API wiring are implemented
 - export commands can fetch bookmarks and write Markdown, JSON, and CSV files locally
+- Markdown exports now prefer full note-tweet content and include raw article metadata when present
 
 ---
 
@@ -41,8 +42,8 @@ Implemented:
 
 Not yet implemented:
 
-- user-facing success messaging polish
 - broader configuration ergonomics
+- polished operator success messaging
 
 ### `product/prd/002-mvp-experience.md`
 
@@ -53,6 +54,7 @@ Implemented:
 - `xport export --format` command shell
 - login flow persists OAuth session and authenticated user identity
 - export flow reads stored session and writes local files
+- Markdown export now renders full note-tweet content when available
 
 Not yet implemented:
 
@@ -68,10 +70,11 @@ Implemented:
 - bookmark and export types
 - bookmark fetch mapping from X API responses
 - export record persistence
+- full-text bookmark fields are now modeled in the domain
 
 Deferred design:
 
-- persistence schema details beyond the current MVP
+- persistence schema details beyond the MVP slice
 
 ### `product/prd/004-platform-and-accessibility.md`
 
@@ -84,7 +87,7 @@ Implemented:
 
 Not yet implemented:
 
-- accessibility review of broader command copy
+- broader accessibility review of command copy and callback flow
 
 ### `product/prd/005-future-direction.md`
 
@@ -105,6 +108,7 @@ Implemented:
 - high-level login and export flows documented
 - login and export command paths are in code
 - export flow supports local refresh and local file output
+- export markdown now includes long-form content when the API provides it
 
 Not yet implemented:
 

@@ -12,14 +12,27 @@ function escapeMarkdown(text: string): string {
 }
 
 function renderBookmark(bookmark: Bookmark, index: number): string {
-  return [
+  const content = bookmark.fullText ?? bookmark.text;
+  const parts = [
     `## ${index + 1}. ${escapeMarkdown(bookmark.authorName)} (@${escapeMarkdown(bookmark.authorHandle)})`,
     "",
-    `> ${escapeMarkdown(bookmark.text)}`,
+    `> ${escapeMarkdown(content)}`,
     "",
     `- URL: ${bookmark.url}`,
     `- Created at: ${bookmark.createdAt}`,
-  ].join("\n");
+  ];
+
+  if (bookmark.article) {
+    parts.push(
+      "",
+      "### Raw Article",
+      "```json",
+      JSON.stringify(bookmark.article, null, 2),
+      "```",
+    );
+  }
+
+  return parts.join("\n");
 }
 
 export function renderMarkdownExport(exportData: BookmarkExport): string {

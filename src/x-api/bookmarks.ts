@@ -13,6 +13,8 @@ interface BookmarkTweet {
   created_at?: string;
   author_id?: string;
   username?: string;
+  note_tweet?: { text?: string; full_text?: string } | string;
+  article?: Record<string, unknown>;
 }
 
 interface BookmarkPage {
@@ -31,14 +33,24 @@ function mapBookmark(
 ): Bookmark {
   const user = tweet.author_id ? usersById.get(tweet.author_id) : undefined;
   const username = user?.username ?? tweet.username ?? "unknown";
+  const noteTweetText =
+    typeof tweet.note_tweet === "string"
+      ? tweet.note_tweet
+      : (tweet.note_tweet?.full_text ?? tweet.note_tweet?.text);
+  const article =
+    tweet.article && Object.keys(tweet.article).length > 0
+      ? tweet.article
+      : undefined;
 
   return {
     id: tweet.id,
     text: tweet.text,
+    fullText: noteTweetText ?? tweet.text,
     authorName: user?.name ?? username,
     authorHandle: username,
     url: `https://x.com/i/web/status/${tweet.id}`,
     createdAt: tweet.created_at ?? new Date(0).toISOString(),
+    ...(article ? { article } : {}),
   };
 }
 
@@ -55,8 +67,9 @@ export async function fetchBookmarks(
       {
         max_results: 100,
         pagination_token: nextToken,
-        "tweet.fields": "author_id,created_at,text",
-        expansions: "author_id",
+        "tweet.fields": "author_id,article,created_at,note_tweet,text",
+        expansions: "article.cover_media,article.media_entities,author_id",
+        "media.fields": "alt_text,height,preview_image_url,type,url,width",
         "user.fields": "id,name,username",
       },
     );

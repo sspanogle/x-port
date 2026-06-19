@@ -16,7 +16,7 @@ Current project state:
 
 - framework bootstrapped into the repo
 - product scope captured in kickoff PRDs
-- login, persistence, and bookmark export plumbing are implemented
+- login, persistence, bookmark export plumbing are implemented
 - callback UX, token refresh ergonomics, and output polishing still need work
 
 ---

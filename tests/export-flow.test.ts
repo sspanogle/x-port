@@ -6,7 +6,7 @@ import { exportBookmarks } from "../src/application/export.js";
 import { openAppDatabase } from "../src/storage/database.js";
 
 describe("export flow", () => {
-  it("exports bookmarks from the stored session and writes a markdown file", async () => {
+  it("exports bookmarks from stored session and writes markdown file", async () => {
     const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), "x-port-data-"));
     const exportDir = fs.mkdtempSync(path.join(os.tmpdir(), "x-port-exports-"));
     const db = openAppDatabase(dataDir);
@@ -32,9 +32,16 @@ describe("export flow", () => {
             data: [
               {
                 id: "1",
-                text: "Hello bookmarks",
+                text: "Short fallback text",
                 created_at: "2026-06-18T20:00:00.000Z",
                 author_id: "2",
+                note_tweet: {
+                  full_text: "Full note tweet content for the markdown export.",
+                },
+                article: {
+                  title: "Article title",
+                  text: "Article body content",
+                },
               },
             ],
             includes: {
@@ -71,8 +78,11 @@ describe("export flow", () => {
       expect(fs.existsSync(path.resolve(output.outputPath))).toBe(true);
 
       const content = fs.readFileSync(path.resolve(output.outputPath), "utf8");
-      expect(content).toContain("Ada Lovelace (@ada)");
-      expect(content).toContain("Hello bookmarks");
+      expect(content).toContain(
+        "Full note tweet content for the markdown export.",
+      );
+      expect(content).toContain("### Raw Article");
+      expect(content).toContain('"title": "Article title"');
     } finally {
       fetchSpy.mockRestore();
       db.close();
