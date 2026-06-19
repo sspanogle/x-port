@@ -14,9 +14,10 @@ Foundation Alignment
 
 Current project state:
 
-- framework bootstrapped into the repo
-- product scope captured in the kickoff and PRDs
-- implementation work has not started yet
+- framework bootstrapped into repo
+- product scope captured in kickoff PRDs
+- initial CLI/package scaffold and pure export formatters are implemented
+- login, persistence, and live X API integration are still pending
 
 ---
 

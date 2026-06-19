@@ -19,8 +19,9 @@ It should be updated when meaningful implementation milestones land.
 Current application status:
 
 - framework bootstrapped into the repository
-- product and technical docs are now seeded with X-Port scope
-- application/runtime code has not been implemented yet
+- product and technical docs are seeded with X-Port scope
+- initial CLI/package scaffold and pure export formatters are implemented
+- OAuth, persistence, and real X API integration are still pending
 
 ---
 
@@ -28,10 +29,12 @@ Current application status:
 
 ### `product/prd/001-product-foundation.md`
 
-Status: planned
+Status: in progress
 Implemented:
 
-- framework and kickoff alignment only
+- framework and kickoff alignment
+- initial CLI/package scaffold
+- pure export formatter layer
 
 Not yet implemented:
 
@@ -41,22 +44,25 @@ Not yet implemented:
 
 ### `product/prd/002-mvp-experience.md`
 
-Status: planned
+Status: in progress
 Implemented:
 
 - command names and core flow defined in docs
+- `xport login` and `xport export --format` command shells
+- basic command validation and help output
 
 Not yet implemented:
 
-- CLI behavior
 - auth and export execution
 
 ### `product/prd/003-domain-rules.md`
 
-Status: planned
+Status: in progress
 Implemented:
 
 - domain vocabulary drafted
+- bookmark and export types
+- pure export formatter layer
 
 Deferred design:
 
@@ -64,10 +70,11 @@ Deferred design:
 
 ### `product/prd/004-platform-and-accessibility.md`
 
-Status: planned
+Status: in progress
 Implemented:
 
 - local-first platform direction defined
+- Node.js CLI scaffold with terminal-first output
 
 Not yet implemented:
 
@@ -86,10 +93,11 @@ Not yet implemented:
 
 ### `product/prd/006-user-flows.md`
 
-Status: planned
+Status: in progress
 Implemented:
 
 - high-level login and export flows documented
+- command shells and validation paths exist
 
 Not yet implemented:
 
@@ -97,14 +105,15 @@ Not yet implemented:
 
 ### `product/prd/007-inputs-and-edge-cases.md`
 
-Status: planned
+Status: in progress
 Implemented:
 
 - primary validation and edge cases identified
+- invalid export format handling exists
 
 Not yet implemented:
 
-- input handling code
+- input handling for OAuth and persistence flows
 
 ---
 
@@ -112,44 +121,49 @@ Not yet implemented:
 
 ### `engineering/tdd/001-architecture.md`
 
-Status: planned
+Status: in progress
 Implemented:
 
 - layered architecture documented
 - module boundaries drafted
+- package, CLI, domain, and exporter files created
 
 ### `engineering/tdd/002-state-and-flow.md`
 
-Status: planned
+Status: in progress
 Implemented:
 
 - state and flow model drafted
+- CLI command dispatch and validation paths are in code
 
 ### `engineering/tdd/003-ui-system.md`
 
-Status: planned
+Status: in progress
 Implemented:
 
 - CLI presentation guidance drafted
+- terminal-facing status messaging helpers exist
 
 ### `engineering/tdd/004-validation-and-persistence.md`
 
-Status: planned
+Status: in progress
 Implemented:
 
 - validation and persistence boundaries drafted
+- command input validation exists for the scaffolded CLI
 
 ### `engineering/tdd/005-testing-strategy.md`
 
-Status: planned
+Status: in progress
 Implemented:
 
 - testing strategy prioritized
+- unit tests cover exporter output and CLI command validation
 
 ---
 
 ## Notes
 
-- repository is in docs-first bootstrap state
-- no runtime behavior is expected to match the PRDs yet
-- update this file again when the first CLI and storage implementation lands
+- repository now has a working scaffold and pure export formatters
+- login, X API access, and persistence still need implementation
+- update this file again when the storage and real export pipeline land

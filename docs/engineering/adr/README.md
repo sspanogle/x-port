@@ -40,7 +40,6 @@ Recommended sections:
 - Consequences
 - Alternatives Considered
 
-
 ## Current ADRs
 
 - `001-separate-prd-tdd-and-implementation-status.md`
